@@ -33,16 +33,13 @@
         <span class="text-xs font-semibold tracking-wide text-cyan-400 flex items-center gap-2">
             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> MY Food Products Support
         </span>
-        <span id="timer-display" class="text-xs font-mono px-2.5 py-0.5 bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 rounded-full">00:00</span>
+        <span class="text-xs font-mono px-2.5 py-0.5 bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 rounded-full">Active</span>
     </header>
 
     <!-- Main Workspace Area with Persistent Chat Log -->
     <main class="flex-1 flex flex-col justify-end p-3 relative overflow-hidden">
         <div id="chat-log" class="w-full flex-1 overflow-y-auto space-y-2 mb-2 pr-1 flex flex-col justify-end">
-            <div class="bg-slate-900/80 border border-slate-800/80 rounded-xl p-2.5 max-w-[85%] self-start text-xs text-slate-300">
-                <span class="text-[10px] text-cyan-400 font-semibold block mb-0.5">Aria</span>
-                Welcome to MY Food Products! How can I help you with our organic products or support today?
-            </div>
+            <!-- Chat history will load here -->
         </div>
     </main>
 
@@ -95,19 +92,11 @@
         </form>
         <div class="flex justify-between items-center text-[10px] text-slate-500 px-1">
             <span>Support Line: +91-9943021998</span>
-            <button id="block-btn" class="text-red-400 hover:underline">Simulate App Block</button>
+            <button id="clear-chat" class="text-red-400 hover:underline">Clear Chat History</button>
         </div>
     </footer>
 
-    <!-- App Block Modal Overlay -->
-    <div id="block-screen" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 hidden flex flex-col items-center justify-center p-6 text-center">
-        <div class="w-16 h-16 bg-red-500/20 border border-red-500/40 rounded-full flex items-center justify-center mb-4 text-2xl">⏳</div>
-        <h2 class="text-xl font-bold mb-2">Whoa, time's up!</h2>
-        <p class="text-xs text-slate-400 max-w-xs mb-6">Let's take a quick break, alright?</p>
-        <button id="dismiss-block" class="w-full max-w-xs py-3 bg-cyan-600 text-white rounded-xl text-xs font-medium shadow-lg">Let's get back</button>
-    </div>
-
-    <!-- Script with Customer Support System Prompt & Loop Protection -->
+    <!-- Script with Persistent Storage & No Expiry -->
     <script>
         const GROQ_API_KEY = "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";
 
@@ -116,47 +105,44 @@
         const chatLog = document.getElementById('chat-log');
         const chatForm = document.getElementById('chat-form');
         const userInput = document.getElementById('user-input');
-        const blockBtn = document.getElementById('block-btn');
-        const blockScreen = document.getElementById('block-screen');
-        const dismissBlock = document.getElementById('dismiss-block');
-        const timerDisplay = document.getElementById('timer-display');
+        const clearChatBtn = document.getElementById('clear-chat');
 
-        let secondsElapsed = 0;
         let recognition = null;
         let isAiSpeaking = false;
 
-        // Screen Time Counter
-        setInterval(() => {
-            secondsElapsed++;
-            const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
-            const secs = String(secondsElapsed % 60).padStart(2, '0');
-            timerDisplay.textContent = `${mins}:${secs}`;
-
-            if (secondsElapsed === 120) {
-                blockScreen.classList.remove('hidden');
-                callGroq("Hey, looks like you've been browsing for a bit. Need any help with our organic items?");
+        // Load chat history from localStorage on startup
+        function loadChatHistory() {
+            const savedHistory = localStorage.getItem('aria_chat_history');
+            if (savedHistory) {
+                chatLog.innerHTML = savedHistory;
+                chatLog.scrollTop = chatLog.scrollHeight;
+            } else {
+                appendMessage('Aria', "Welcome to MY Food Products! How can I help you with our organic products or support today?", false);
             }
-        }, 1000);
+        }
 
-        blockBtn.addEventListener('click', () => {
-            blockScreen.classList.remove('hidden');
-            callGroq("App block triggered!");
+        // Save chat history to localStorage
+        function saveChatHistory() {
+            localStorage.setItem('aria_chat_history', chatLog.innerHTML);
+        }
+
+        clearChatBtn.addEventListener('click', () => {
+            localStorage.removeItem('aria_chat_history');
+            chatLog.innerHTML = '';
+            appendMessage('Aria', "Chat history cleared. How can I help you today?", true);
         });
 
-        dismissBlock.addEventListener('click', () => {
-            blockScreen.classList.add('hidden');
-            secondsElapsed = 0;
-            callGroq("Welcome back! How can I assist you further?");
-        });
-
-        // Add message to persistent chat log
-        function appendMessage(sender, text) {
+        // Add message to persistent chat log & save state
+        function appendMessage(sender, text, save = true) {
             const msgDiv = document.createElement('div');
             const isUser = sender === 'You';
             msgDiv.className = `p-2.5 rounded-xl max-w-[85%] text-xs ${isUser ? 'bg-cyan-950/80 border border-cyan-800/60 self-end text-cyan-100' : 'bg-slate-900/80 border border-slate-800/80 self-start text-slate-300'}`;
             msgDiv.innerHTML = `<span class="text-[10px] ${isUser ? 'text-cyan-300' : 'text-cyan-400'} font-semibold block mb-0.5">${sender}</span>${text}`;
             chatLog.appendChild(msgDiv);
             chatLog.scrollTop = chatLog.scrollHeight;
+            if (save) {
+                saveChatHistory();
+            }
         }
 
         // Text-to-Speech Speaker Engine & Mouth Animation
@@ -233,11 +219,9 @@
             }
         }
 
-        // Greet on startup
+        // Initialize on page load
         window.addEventListener('load', () => {
-            setTimeout(() => {
-                callGroq("Hello! Greet our customer warmly and ask how you can help them with MY Food Products today.");
-            }, 800);
+            loadChatHistory();
             startContinuousListening();
         });
 
