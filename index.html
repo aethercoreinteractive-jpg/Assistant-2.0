@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aria - Autonomous Anime Companion</title>
+    <title>MY Food Products - Customer Support</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -28,10 +28,10 @@
 </head>
 <body class="bg-slate-950 text-white h-[100dvh] w-screen overflow-hidden flex flex-col justify-between select-none font-sans m-0 p-0 box-border">
 
-    <!-- Top Status Bar -->
+    <!-- Top Status Bar Branded for MY Food Products -->
     <header class="w-full px-4 py-2.5 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 flex justify-between items-center z-10 shrink-0">
         <span class="text-xs font-semibold tracking-wide text-cyan-400 flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Groq Lightning Core Active
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> MY Food Products Support
         </span>
         <span id="timer-display" class="text-xs font-mono px-2.5 py-0.5 bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 rounded-full">00:00</span>
     </header>
@@ -41,7 +41,7 @@
         <div id="chat-log" class="w-full flex-1 overflow-y-auto space-y-2 mb-2 pr-1 flex flex-col justify-end">
             <div class="bg-slate-900/80 border border-slate-800/80 rounded-xl p-2.5 max-w-[85%] self-start text-xs text-slate-300">
                 <span class="text-[10px] text-cyan-400 font-semibold block mb-0.5">Aria</span>
-                Hey! Groq engine is locked and loaded. What's on your mind?
+                Welcome to MY Food Products! How can I help you with our organic products or support today?
             </div>
         </div>
     </main>
@@ -90,11 +90,11 @@
     <!-- Bottom Controls & Text Input Footer -->
     <footer class="w-full bg-slate-900/95 backdrop-blur-md border-t border-slate-800 p-3 flex flex-col gap-2 z-10 shrink-0">
         <form id="chat-form" class="flex gap-2">
-            <input type="text" id="user-input" placeholder="Type something, buddy..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+            <input type="text" id="user-input" placeholder="Type your doubt or question..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
             <button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-xl text-xs font-medium shadow-lg shadow-cyan-600/30">Send</button>
         </form>
         <div class="flex justify-between items-center text-[10px] text-slate-500 px-1">
-            <span>Persistent Log: Active</span>
+            <span>Support Line: +91-9943021998</span>
             <button id="block-btn" class="text-red-400 hover:underline">Simulate App Block</button>
         </div>
     </footer>
@@ -107,7 +107,7 @@
         <button id="dismiss-block" class="w-full max-w-xs py-3 bg-cyan-600 text-white rounded-xl text-xs font-medium shadow-lg">Let's get back</button>
     </div>
 
-    <!-- Script with Verified Production Model ID -->
+    <!-- Script with Customer Support System Prompt & Loop Protection -->
     <script>
         const GROQ_API_KEY = "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";
 
@@ -134,7 +134,7 @@
 
             if (secondsElapsed === 120) {
                 blockScreen.classList.remove('hidden');
-                callGroq("Hey, looks like we've been at this for a bit. Want to lock things down for a second?");
+                callGroq("Hey, looks like you've been browsing for a bit. Need any help with our organic items?");
             }
         }, 1000);
 
@@ -146,7 +146,7 @@
         dismissBlock.addEventListener('click', () => {
             blockScreen.classList.add('hidden');
             secondsElapsed = 0;
-            callGroq("We're back!");
+            callGroq("Welcome back! How can I assist you further?");
         });
 
         // Add message to persistent chat log
@@ -205,7 +205,7 @@
                         messages: [
                             {
                                 role: "system",
-                                content: "You are Aria, a close, friendly anime companion. Talk casually like a best friend, use friendly language, and avoid sounding formal, robotic, or like a servant. Keep answers short and sweet so they are easy to speak aloud."
+                                content: "You are Aria, the official, professional yet warm customer service and sales assistant for MY Food Products. Your job is to help customers solve doubts, navigate organic products, explain order details, and guide them smoothly. Key Business Facts to remember: 1) We deliver all over India. 2) Free delivery is available, though it is subject to change based on the customer's exact location. 3) All payment methods are accepted. 4) MY Food Products is an organic food business that directs its profits toward charity initiatives run by Munchirai YMCA. 5) If a customer has a complex issue, complaint, or bulk order inquiry, direct them immediately to our dedicated support line at +91-9943021998 or point them to our store page at mystore.html. Keep your answers clear, concise, helpful, and friendly so they sound natural when spoken aloud."
                             },
                             {
                                 role: "user",
@@ -221,13 +221,13 @@
                     appendMessage('Aria', aiReply);
                     speakAloud(aiReply);
                 } else {
-                    const errorMsg = data.error?.message || "Oops, having a little trouble connecting right now!";
+                    const errorMsg = data.error?.message || "Oops, having a little trouble connecting right now! You can contact us directly at +91-9943021998.";
                     appendMessage('Aria', errorMsg);
                     speakAloud(errorMsg);
                 }
             } catch (err) {
                 console.error(err);
-                const netMsg = "Ah, network glitch on my end!";
+                const netMsg = "Ah, network glitch on my end! Please reach us at +91-9943021998.";
                 appendMessage('Aria', netMsg);
                 speakAloud(netMsg);
             }
@@ -236,12 +236,12 @@
         // Greet on startup
         window.addEventListener('load', () => {
             setTimeout(() => {
-                callGroq("Hey! Say a warm, casual hello to me.");
+                callGroq("Hello! Greet our customer warmly and ask how you can help them with MY Food Products today.");
             }, 800);
             startContinuousListening();
         });
 
-        // Always-On Voice Detection
+        // Always-On Voice Detection with Self-Speech Protection
         function startContinuousListening() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
