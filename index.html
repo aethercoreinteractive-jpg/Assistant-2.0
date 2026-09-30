@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI Voice Companion & Screen Guard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes floatMotion {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(1.5deg); }
+        }
+        .assistant-floating {
+            animation: floatMotion 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-white h-screen w-screen overflow-hidden flex flex-col justify-between select-none">
+
+    <!-- Screen Mock Content (Simulating active apps) -->
+    <header class="w-full p-4 bg-slate-900/60 backdrop-blur-md border-b border-slate-800 flex justify-between items-center z-10">
+        <span class="text-sm font-semibold tracking-wide text-slate-300">📱 Screen Guard Active</span>
+        <span id="timer-display" class="text-xs font-mono px-3 py-1 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-full">00:00 elapsed</span>
+    </header>
+
+    <main class="flex-1 flex flex-col items-center justify-center p-6 text-center relative">
+        <div class="max-w-xs space-y-3">
+            <h1 class="text-2xl font-bold tracking-tight">AI Assistant Companion</h1>
+            <p class="text-xs text-slate-400 leading-relaxed">Drag your companion anywhere on screen, talk via ChatGPT Voice, or set your app time limits.</p>
+        </div>
+    </main>
+
+    <!-- Floating Draggable Companion Overlay -->
+    <div id="companion" class="absolute bottom-24 right-6 cursor-grab active:cursor-grabbing z-50 assistant-floating flex flex-col items-center group touch-none">
+        <!-- Speech / Status Bubble -->
+        <div id="speech-bubble" class="hidden mb-2 px-3 py-1.5 bg-slate-900 border border-slate-700 text-xs rounded-xl shadow-2xl max-w-[140px] text-center text-indigo-300 font-medium">
+            Ready to chat...
+        </div>
+        <!-- Avatar Graphic -->
+        <div class="w-16 h-16 bg-gradient-to-tr from-indigo-600 to-violet-500 rounded-2xl flex items-center justify-center shadow-2xl border-2 border-indigo-400/50 group-hover:scale-105 transition-transform">
+            <span class="text-3xl">🤖</span>
+        </div>
+    </div>
+
+    <!-- Bottom Controls Footer -->
+    <footer class="w-full bg-slate-900/90 backdrop-blur-md border-t border-slate-800 p-4 flex items-center justify-between gap-3 z-10">
+        <button id="voice-btn" class="flex-1 py-3 px-4 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white rounded-xl font-medium text-xs flex items-center justify-center gap-2 transition-colors shadow-lg shadow-indigo-600/30">
+            <span>🎤</span> Connect ChatGPT Voice
+        </button>
+        <button id="block-btn" class="py-3 px-4 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl text-xs font-medium transition-colors">
+            Simulate App Block
+        </button>
+    </footer>
+
+    <!-- App Block Overlay Screen (Triggered when time limit is reached) -->
+    <div id="block-screen" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 hidden flex flex-col items-center justify-center p-6 text-center">
+        <div class="w-16 h-16 bg-red-500/20 border border-red-500/40 rounded-full flex items-center justify-center mb-4 text-2xl">⏳</div>
+        <h2 class="text-xl font-bold mb-2">Time Limit Reached!</h2>
+        <p class="text-xs text-slate-400 max-w-xs mb-6">You've exceeded your designated app screen time. Your assistant has closed the app.</p>
+        <button id="dismiss-block" class="w-full max-w-xs py-3 bg-indigo-600 text-white rounded-xl text-xs font-medium shadow-lg">Return to Home</button>
+    </div>
+
+    <!-- Application JavaScript Logic -->
+    <script>
+        const companion = document.getElementById('companion');
+        const speechBubble = document.getElementById('speech-bubble');
+        const voiceBtn = document.getElementById('voice-btn');
+        const blockBtn = document.getElementById('block-btn');
+        const blockScreen = document.getElementById('block-screen');
+        const dismissBlock = document.getElementById('dismiss-block');
+        const timerDisplay = document.getElementById('timer-display');
+
+        let isVoiceActive = false;
+        let secondsElapsed = 0;
+
+        // Screen Time Counter Simulation
+        setInterval(() => {
+            secondsElapsed++;
+            const mins = String(Math.floor(secondsElapsed / 60)).padStart(2, '0');
+            const secs = String(secondsElapsed % 60).padStart(2, '0');
+            timerDisplay.textContent = `${mins}:${secs} elapsed`;
+
+            // Auto-trigger block screen simulation at 2 minutes (120 seconds) for testing
+            if (secondsElapsed === 120) {
+                blockScreen.classList.remove('hidden');
+            }
+        }, 1000);
+
+        blockBtn.addEventListener('click', () => {
+            blockScreen.classList.remove('hidden');
+        });
+
+        dismissBlock.addEventListener('click', () => {
+            blockScreen.classList.add('hidden');
+            secondsElapsed = 0;
+        });
+
+        // Touch & Drag Support for Mobile Screens
+        let startX, startY, initialX, initialY, isDragging = false;
+
+        companion.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            initialX = companion.offsetLeft;
+            initialY = companion.offsetTop;
+            companion.style.bottom = 'auto';
+            companion.style.right = 'auto';
+        }, { passive: true });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const dx = e.touches[0].clientX - startX;
+            const dy = e.touches[0].clientY - startY;
+            companion.style.left = `${initialX + dx}px`;
+            companion.style.top = `${initialY + dy}px`;
+        }, { passive: true });
+
+        window.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        // ChatGPT Voice Toggle Handler (WebRTC Integration Hook)
+        voiceBtn.addEventListener('click', async () => {
+            isVoiceActive = !isVoiceActive;
+            if (isVoiceActive) {
+                voiceBtn.innerHTML = '<span>🔴</span> Disconnect Voice';
+                voiceBtn.classList.replace('bg-indigo-600', 'bg-red-600');
+                speechBubble.classList.remove('hidden');
+                speechBubble.textContent = "Listening via ChatGPT...";
+                
+                // Note: To make this fully live with OpenAI Realtime WebRTC, 
+                // fetch your ephemeral session token from your backend server here 
+                // and initialize your RTCPeerConnection audio stream.
+            } else {
+                voiceBtn.innerHTML = '<span>🎤</span> Connect ChatGPT Voice';
+                voiceBtn.classList.replace('bg-red-600', 'bg-indigo-600');
+                speechBubble.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
