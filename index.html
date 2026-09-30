@@ -31,7 +31,7 @@
     <!-- Top Status Bar -->
     <header class="w-full px-4 py-2.5 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 flex justify-between items-center z-10 shrink-0">
         <span class="text-xs font-semibold tracking-wide text-cyan-400 flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Aria Cloud Core Active
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Groq Lightning Core Active
         </span>
         <span id="timer-display" class="text-xs font-mono px-2.5 py-0.5 bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 rounded-full">00:00</span>
     </header>
@@ -41,7 +41,7 @@
         <div id="chat-log" class="w-full flex-1 overflow-y-auto space-y-2 mb-2 pr-1 flex flex-col justify-end">
             <div class="bg-slate-900/80 border border-slate-800/80 rounded-xl p-2.5 max-w-[85%] self-start text-xs text-slate-300">
                 <span class="text-[10px] text-cyan-400 font-semibold block mb-0.5">Aria</span>
-                Hey! Everything's up and running. What's up?
+                Hey! Groq engine is locked and loaded. What's on your mind?
             </div>
         </div>
     </main>
@@ -107,9 +107,9 @@
         <button id="dismiss-block" class="w-full max-w-xs py-3 bg-cyan-600 text-white rounded-xl text-xs font-medium shadow-lg">Let's get back</button>
     </div>
 
-    <!-- Script with Parameter Token and Friendly Persona -->
+    <!-- Script with Groq API Key Integrated -->
     <script>
-        const GEMINI_TOKEN = "AQ.Ab8RN6LCAL4HeVKmcWDJ3REVZBR3oKtOaajgOH70h6zOjN496A";
+        const GROQ_API_KEY = "Gsk_R7y1SoCbEKJReO4k4P7XWGdyb3FYi4QDJcLjIJx0rbwd3UIu7U0X";
 
         const companion = document.getElementById('companion');
         const avatarContainer = document.getElementById('avatar-container');
@@ -132,19 +132,19 @@
 
             if (secondsElapsed === 120) {
                 blockScreen.classList.remove('hidden');
-                callGemini("Hey, looks like we've been at this for a bit. Want to lock things down for a second?");
+                callGroq("Hey, looks like we've been at this for a bit. Want to lock things down for a second?");
             }
         }, 1000);
 
         blockBtn.addEventListener('click', () => {
             blockScreen.classList.remove('hidden');
-            callGemini("App block triggered!");
+            callGroq("App block triggered!");
         });
 
         dismissBlock.addEventListener('click', () => {
             blockScreen.classList.add('hidden');
             secondsElapsed = 0;
-            callGemini("We're back!");
+            callGroq("We're back!");
         });
 
         // Add message to persistent chat log
@@ -177,31 +177,35 @@
             }
         }
 
-        // Live Gemini API Connection Function using ?key= query param
-        async function callGemini(promptText) {
+        // Fast Groq API Connection Function
+        async function callGroq(promptText) {
             appendMessage('You', promptText);
 
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_TOKEN}`, {
+                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${GROQ_API_KEY}`
                     },
                     body: JSON.stringify({
-                        contents: [
+                        model: "llama-3.1-8b-instant",
+                        messages: [
+                            {
+                                role: "system",
+                                content: "You are Aria, a close, friendly anime companion. Talk casually like a best friend, use friendly language, and avoid sounding formal, robotic, or like a servant. Keep answers short and sweet so they are easy to speak aloud."
+                            },
                             {
                                 role: "user",
-                                parts: [
-                                    { text: "System Instruction: You are Aria, a close, friendly anime companion. Talk casually like a best friend, use friendly language, and avoid sounding formal, robotic, or like a servant. Keep answers short and sweet so they are easy to speak aloud. User Message: " + promptText }
-                                ]
+                                content: promptText
                             }
                         ]
                     })
                 });
 
                 const data = await response.json();
-                if (data.candidates && data.candidates[0].content.parts[0].text) {
-                    const aiReply = data.candidates[0].content.parts[0].text.trim();
+                if (data.choices && data.choices[0].message.content) {
+                    const aiReply = data.choices[0].message.content.trim();
                     appendMessage('Aria', aiReply);
                     speakAloud(aiReply);
                 } else {
@@ -220,7 +224,7 @@
         // Greet on startup
         window.addEventListener('load', () => {
             setTimeout(() => {
-                callGemini("Hey! Say a warm, casual hello to me.");
+                callGroq("Hey! Say a warm, casual hello to me.");
             }, 800);
             startContinuousListening();
         });
@@ -236,7 +240,7 @@
 
                 recognition.onresult = (event) => {
                     const speechToText = event.results[event.results.length - 1][0].transcript.trim();
-                    callGemini(speechToText);
+                    callGroq(speechToText);
                 };
 
                 recognition.onerror = () => {
@@ -256,7 +260,7 @@
             if(!text) return;
             userInput.value = '';
             
-            callGemini(text);
+            callGroq(text);
         });
 
         // Mobile Touch & Drag Logic
