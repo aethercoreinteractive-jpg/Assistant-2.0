@@ -31,17 +31,31 @@
     <!-- Top Status Bar -->
     <header class="w-full px-4 py-2.5 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 flex justify-between items-center z-10 shrink-0">
         <span class="text-xs font-semibold tracking-wide text-cyan-400 flex items-center gap-2">
-            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Gemini Cloud Core Active, Boss
+            <span id="status-dot" class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span> 
+            <span id="status-text">Aria Ready (Add Key)</span>
         </span>
-        <span id="timer-display" class="text-xs font-mono px-2.5 py-0.5 bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 rounded-full">00:00</span>
+        <div class="flex items-center gap-2">
+            <button id="settings-toggle" class="text-[10px] bg-slate-800 hover:bg-slate-700 text-cyan-300 px-2.5 py-1 rounded-lg border border-slate-700">⚙️ API Key</button>
+            <span id="timer-display" class="text-xs font-mono px-2.5 py-0.5 bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 rounded-full">00:00</span>
+        </div>
     </header>
+
+    <!-- Slide-down Settings Panel for API Key -->
+    <div id="settings-panel" class="bg-slate-900 border-b border-slate-800 px-4 py-3 hidden flex flex-col gap-2 z-20 shrink-0">
+        <label class="text-[11px] text-slate-300 font-medium">Enter your Google AI Studio API Key (starts with AIza...):</label>
+        <div class="flex gap-2">
+            <input type="password" id="api-key-input" placeholder="AIzaSy..." class="flex-1 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-500">
+            <button id="save-key-btn" class="bg-cyan-600 hover:bg-cyan-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium">Save</button>
+        </div>
+        <span class="text-[10px] text-slate-500">Your key is saved safely in your browser's local storage and never published.</span>
+    </div>
 
     <!-- Main Workspace Area with Persistent Chat Log -->
     <main class="flex-1 flex flex-col justify-end p-3 relative overflow-hidden">
         <div id="chat-log" class="w-full flex-1 overflow-y-auto space-y-2 mb-2 pr-1 flex flex-col justify-end">
             <div class="bg-slate-900/80 border border-slate-800/80 rounded-xl p-2.5 max-w-[85%] self-start text-xs text-slate-300">
                 <span class="text-[10px] text-cyan-400 font-semibold block mb-0.5">Aria</span>
-                Gemini Cloud systems online, Boss. Chat history stays right here.
+                Tap the ⚙️ API Key button above, Boss, and paste your Google AI Studio key to activate my brain!
             </div>
         </div>
     </main>
@@ -107,10 +121,8 @@
         <button id="dismiss-block" class="w-full max-w-xs py-3 bg-cyan-600 text-white rounded-xl text-xs font-medium shadow-lg">Return to Home</button>
     </div>
 
-    <!-- Script with Bearer Token Gemini Integration -->
+    <!-- Script with Browser-Stored API Key Integration -->
     <script>
-        const GEMINI_TOKEN = "AQ.Ab8RN6IwO4eT00rGMJ631lSXUs3tsPaxtKfqw9gyYNzrlp2iAA";
-
         const companion = document.getElementById('companion');
         const avatarContainer = document.getElementById('avatar-container');
         const chatLog = document.getElementById('chat-log');
@@ -120,8 +132,40 @@
         const blockScreen = document.getElementById('block-screen');
         const dismissBlock = document.getElementById('dismiss-block');
         const timerDisplay = document.getElementById('timer-display');
+        
+        const settingsToggle = document.getElementById('settings-toggle');
+        const settingsPanel = document.getElementById('settings-panel');
+        const apiKeyInput = document.getElementById('api-key-input');
+        const saveKeyBtn = document.getElementById('save-key-btn');
+        const statusDot = document.getElementById('status-dot');
+        const statusText = document.getElementById('status-text');
 
         let secondsElapsed = 0;
+
+        // Load saved key on startup
+        let currentApiKey = localStorage.getItem('aria_gemini_key') || '';
+        if (currentApiKey) {
+            apiKeyInput.value = currentApiKey;
+            statusDot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+            statusText.textContent = 'Gemini Core Active';
+        }
+
+        settingsToggle.addEventListener('click', () => {
+            settingsPanel.classList.toggle('hidden');
+        });
+
+        saveKeyBtn.addEventListener('click', () => {
+            const key = apiKeyInput.value.trim();
+            if (key) {
+                localStorage.setItem('aria_gemini_key', key);
+                currentApiKey = key;
+                settingsPanel.classList.add('hidden');
+                statusDot.className = 'w-2 h-2 rounded-full bg-emerald-400 animate-pulse';
+                statusText.textContent = 'Gemini Core Active';
+                appendMessage('Aria', 'API Key saved successfully, Boss!');
+                speakAloud('API Key saved successfully, Boss!');
+            }
+        });
 
         // Screen Time Counter
         setInterval(() => {
@@ -177,16 +221,22 @@
             }
         }
 
-        // Live Gemini API Connection Function using Bearer Auth
+        // Live Gemini API Connection Function using standard AI Studio key
         async function callGemini(promptText) {
             appendMessage('Boss', promptText);
 
+            if (!currentApiKey) {
+                const noKeyMsg = "Please tap the ⚙️ API Key button at the top and enter your Gemini API key first, Boss!";
+                appendMessage('Aria', noKeyMsg);
+                speakAloud("Please enter your API key first, Boss.");
+                return;
+            }
+
             try {
-                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent`, {
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${currentApiKey}`, {
                     method: "POST",
                     headers: {
-                        "Content-Type": "application/json",
-                        "Authorization": `Bearer ${GEMINI_TOKEN}`
+                        "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
                         contents: [
@@ -206,7 +256,7 @@
                     appendMessage('Aria', aiReply);
                     speakAloud(aiReply);
                 } else {
-                    const errorMsg = data.error?.message || "Error connecting to Gemini Cloud, Boss.";
+                    const errorMsg = data.error?.message || "Error from Gemini service, Boss.";
                     appendMessage('Aria', errorMsg);
                     speakAloud(errorMsg);
                 }
@@ -221,7 +271,9 @@
         // Greet Boss on startup
         window.addEventListener('load', () => {
             setTimeout(() => {
-                callGemini("Greet the boss and ask for instructions.");
+                if (currentApiKey) {
+                    callGemini("Greet the boss and ask for instructions.");
+                }
             }, 800);
             startContinuousListening();
         });
@@ -284,5 +336,4 @@
         window.addEventListener('touchend', () => { isDragging = false; });
     </script>
 </body>
-                    </html>
-                    
+</html>
