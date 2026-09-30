@@ -37,8 +37,8 @@
     <!-- Main Workspace Area -->
     <main class="flex-1 flex flex-col items-center justify-center p-6 text-center relative">
         <div class="max-w-xs space-y-2">
-            <h1 class="text-lg font-bold tracking-tight">Always Active</h1>
-            <p class="text-xs text-slate-400 leading-relaxed">Drag Aria anywhere. She listens automatically, replies via speaker, and responds to your typing below.</p>
+            <h1 class="text-lg font-bold tracking-tight">Always Active, Boss</h1>
+            <p class="text-xs text-slate-400 leading-relaxed">Drag me anywhere. I'm listening, ready to answer, and guarding your screen time.</p>
         </div>
     </main>
 
@@ -46,8 +46,8 @@
     <div id="companion" class="absolute bottom-28 right-5 cursor-grab active:cursor-grabbing z-50 animate-breathe flex flex-col items-center group touch-none">
         
         <!-- Reactive Speech Bubble -->
-        <div id="speech-bubble" class="mb-2 px-3 py-1.5 bg-slate-900/95 border border-slate-700 text-xs rounded-2xl shadow-2xl max-w-[150px] text-center text-cyan-300 font-medium backdrop-blur-md">
-            Listening...
+        <div id="speech-bubble" class="mb-2 px-3 py-1.5 bg-slate-900/95 border border-slate-700 text-xs rounded-2xl shadow-2xl max-w-[160px] text-center text-cyan-300 font-medium backdrop-blur-md">
+            Listening, Boss...
         </div>
 
         <!-- Animated Avatar Box -->
@@ -82,11 +82,11 @@
     <footer class="w-full bg-slate-900/95 backdrop-blur-md border-t border-slate-800 p-3 flex flex-col gap-2 z-10">
         <!-- Text Box Input Form -->
         <form id="chat-form" class="flex gap-2">
-            <input type="text" id="user-input" placeholder="Type a message to Aria..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+            <input type="text" id="user-input" placeholder="Give an order, Boss..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
             <button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-xl text-xs font-medium shadow-lg shadow-cyan-600/30">Send</button>
         </form>
         <div class="flex justify-between items-center text-[10px] text-slate-500 px-1">
-            <span>Mic: Active listening</span>
+            <span>Mic: Autonomous stream</span>
             <button id="block-btn" class="text-red-400 hover:underline">Simulate App Block</button>
         </div>
     </footer>
@@ -94,8 +94,8 @@
     <!-- App Block Modal Overlay -->
     <div id="block-screen" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 hidden flex flex-col items-center justify-center p-6 text-center">
         <div class="w-16 h-16 bg-red-500/20 border border-red-500/40 rounded-full flex items-center justify-center mb-4 text-2xl">⏳</div>
-        <h2 class="text-xl font-bold mb-2">Time Limit Exceeded!</h2>
-        <p class="text-xs text-slate-400 max-w-xs mb-6">Aria has locked your session to keep you on schedule.</p>
+        <h2 class="text-xl font-bold mb-2">Time Limit Exceeded, Boss!</h2>
+        <p class="text-xs text-slate-400 max-w-xs mb-6">I have locked your session to keep your workflow secure.</p>
         <button id="dismiss-block" class="w-full max-w-xs py-3 bg-cyan-600 text-white rounded-xl text-xs font-medium shadow-lg">Return to Home</button>
     </div>
 
@@ -122,22 +122,22 @@
 
             if (secondsElapsed === 120) {
                 blockScreen.classList.remove('hidden');
-                speakAloud("Time limit reached. I am locking your session.");
+                speakAloud("Time limit reached, Boss. Locking session.");
             }
         }, 1000);
 
         blockBtn.addEventListener('click', () => {
             blockScreen.classList.remove('hidden');
-            speakAloud("App block triggered.");
+            speakAloud("App block triggered, Boss.");
         });
 
         dismissBlock.addEventListener('click', () => {
             blockScreen.classList.add('hidden');
             secondsElapsed = 0;
-            speakAloud("Welcome back! Session reset.");
+            speakAloud("Welcome back, Boss. Session reset.");
         });
 
-        // Speaker Output & Lip-Sync Engine
+        // Speaker Output & Direct Assistant Persona Engine
         function speakAloud(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -153,22 +153,22 @@
                 };
                 utterance.onend = () => {
                     avatarContainer.classList.remove('is-talking', 'border-red-400');
-                    setTimeout(() => speechBubble.classList.add('hidden'), 2000);
+                    setTimeout(() => speechBubble.classList.add('hidden'), 2500);
                 };
 
                 window.speechSynthesis.speak(utterance);
             }
         }
 
-        // Greet on startup automatically
+        // Greet Boss on startup
         window.addEventListener('load', () => {
             setTimeout(() => {
-                speakAloud("Hi! I am Aria, always active and listening.");
+                speakAloud("Standing by, Boss. What are your orders?");
             }, 800);
             startContinuousListening();
         });
 
-        // Always-On Voice Detection (Speech Recognition API)
+        // Always-On Voice Detection
         function startContinuousListening() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -178,22 +178,23 @@
                 recognition.lang = 'en-US';
 
                 recognition.onresult = (event) => {
-                    const speechToText = event.results[event.results.length - 1][0].transcript.trim();
-                    speechBubble.textContent = `You: "${speechToText}"`;
-                    speechBubble.classList.remove('hidden');
-
-                    // Generate contextual reply spoken aloud
-                    let reply = `I heard you say, ${speechToText}. How can I help?`;
-                    if(speechToText.toLowerCase().includes('hello') || speechToText.toLowerCase().includes('hi')) {
-                        reply = "Hello there! I'm right here with you.";
-                    } else if(speechToText.toLowerCase().includes('time')) {
-                        reply = `You have spent ${timerDisplay.textContent} on your screen.`;
+                    const speechToText = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+                    
+                    // Direct conversational replies acting strictly as assistant to boss
+                    let reply = "I'm on it, Boss.";
+                    if (speechToText.includes('hello') || speechToText.includes('hi')) {
+                        reply = "At your service, Boss.";
+                    } else if (speechToText.includes('time')) {
+                        reply = `You have spent ${timerDisplay.textContent} on screen, Boss.`;
+                    } else if (speechToText.includes('status')) {
+                        reply = "All systems operational. Guarding your screen, Boss.";
+                    } else {
+                        reply = `Understood, Boss. Working on it right now.`;
                     }
                     speakAloud(reply);
                 };
 
                 recognition.onerror = () => {
-                    // Auto-restart recognition loop if it drops
                     setTimeout(() => { try { recognition.start(); } catch(e){} }, 1000);
                 };
 
@@ -212,7 +213,20 @@
             if(!text) return;
             
             userInput.value = '';
-            speakAloud(`You typed: ${text}. Processing your request.`);
+            
+            // Direct assistant persona replies
+            let reply = "Right away, Boss.";
+            const lower = text.toLowerCase();
+            if (lower.includes('status') || lower.includes('report')) {
+                reply = `Screen active for ${timerDisplay.textContent}. Standing guard.`;
+            } else if (lower.includes('lock') || lower.includes('block')) {
+                blockScreen.classList.remove('hidden');
+                reply = "Locking screen now, Boss.";
+            } else {
+                reply = `Got it, Boss. Executing your order.`;
+            }
+            
+            speakAloud(reply);
         });
 
         // Mobile Touch & Drag Logic for Companion
