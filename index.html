@@ -3,116 +3,114 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aria - AI Voice Companion</title>
+    <title>Aria - Autonomous Companion</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Smooth Breathing Animation */
         @keyframes breathe {
             0%, 100% { transform: translateY(0px) scale(1); }
-            50% { transform: translateY(-5px) scale(1.02); }
+            50% { transform: translateY(-4px) scale(1.02); }
         }
-        /* Blinking Eyelid Simulation */
         @keyframes blink {
             0%, 90%, 100% { transform: scaleY(1); }
             95% { transform: scaleY(0.1); }
         }
-        /* Talking Mouth Animation */
         @keyframes talk {
             0%, 100% { height: 4px; border-radius: 2px; }
-            50% { height: 12px; border-radius: 50%; }
+            50% { height: 14px; border-radius: 50%; }
         }
         .animate-breathe { animation: breathe 3.5s ease-in-out infinite; }
         .animate-blink { animation: blink 4s infinite; transform-origin: center; }
-        .is-talking .animate-mouth { animation: talk 0.3s ease-in-out infinite; background-color: #38bdf8; }
+        .is-talking .animate-mouth { animation: talk 0.25s ease-in-out infinite; background-color: #38bdf8; }
     </style>
 </head>
 <body class="bg-slate-950 text-white h-screen w-screen overflow-hidden flex flex-col justify-between select-none font-sans">
 
-    <!-- Screen Header Status -->
-    <header class="w-full p-4 bg-slate-900/60 backdrop-blur-md border-b border-slate-800 flex justify-between items-center z-10">
-        <span class="text-xs font-semibold tracking-wide text-slate-300">✨ Aria AI Companion Active</span>
-        <span id="timer-display" class="text-xs font-mono px-3 py-1 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 rounded-full">00:00 elapsed</span>
+    <!-- Top Status Bar -->
+    <header class="w-full p-3 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 flex justify-between items-center z-10">
+        <span class="text-xs font-semibold tracking-wide text-cyan-400 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Aria Live & Listening
+        </span>
+        <span id="timer-display" class="text-xs font-mono px-2.5 py-1 bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 rounded-full">00:00 elapsed</span>
     </header>
 
+    <!-- Main Workspace Area -->
     <main class="flex-1 flex flex-col items-center justify-center p-6 text-center relative">
         <div class="max-w-xs space-y-2">
-            <h1 class="text-xl font-bold tracking-tight">Meet Aria</h1>
-            <p class="text-xs text-slate-400 leading-relaxed">Drag her anywhere, tap her to change expressions, or start ChatGPT voice chat below.</p>
+            <h1 class="text-lg font-bold tracking-tight">Always Active</h1>
+            <p class="text-xs text-slate-400 leading-relaxed">Drag Aria anywhere. She listens automatically, replies via speaker, and responds to your typing below.</p>
         </div>
     </main>
 
-    <!-- Floating Animated Anime Girl Companion Overlay -->
-    <div id="companion" class="absolute bottom-24 right-6 cursor-grab active:cursor-grabbing z-50 animate-breathe flex flex-col items-center group touch-none">
+    <!-- Floating Draggable Companion Widget -->
+    <div id="companion" class="absolute bottom-28 right-5 cursor-grab active:cursor-grabbing z-50 animate-breathe flex flex-col items-center group touch-none">
         
-        <!-- Interactive Speech Bubble -->
-        <div id="speech-bubble" class="hidden mb-2 px-3.5 py-2 bg-slate-900/90 border border-slate-700/80 text-xs rounded-2xl shadow-2xl max-w-[160px] text-center text-cyan-300 font-medium backdrop-blur-sm">
-            Hey there! Tap me to talk.
+        <!-- Reactive Speech Bubble -->
+        <div id="speech-bubble" class="mb-2 px-3 py-1.5 bg-slate-900/95 border border-slate-700 text-xs rounded-2xl shadow-2xl max-w-[150px] text-center text-cyan-300 font-medium backdrop-blur-md">
+            Listening...
         </div>
 
-        <!-- Animated Girl Avatar Container -->
-        <div id="avatar-container" class="w-20 h-20 bg-gradient-to-tr from-cyan-600 via-indigo-600 to-violet-500 rounded-full p-1 shadow-2xl shadow-cyan-500/20 border-2 border-cyan-400/40 group-hover:scale-105 transition-transform flex items-center justify-center relative overflow-hidden">
-            
-            <!-- Hair / Hood Background Layer -->
+        <!-- Animated Avatar Box -->
+        <div id="avatar-container" class="w-16 h-16 bg-gradient-to-tr from-cyan-600 via-indigo-600 to-violet-500 rounded-full p-0.5 shadow-2xl shadow-cyan-500/30 border-2 border-cyan-400/60 group-hover:scale-105 transition-transform flex items-center justify-center relative overflow-hidden">
             <div class="absolute inset-1 bg-slate-900 rounded-full flex flex-col items-center justify-center relative">
-                
-                <!-- Cyberpunk Visor / Glow Accent -->
-                <div class="absolute top-2 w-12 h-1 bg-cyan-400/30 rounded-full blur-[1px]"></div>
+                <!-- Visor Accent -->
+                <div class="absolute top-1.5 w-10 h-1 bg-cyan-400/40 rounded-full blur-[0.5px]"></div>
 
-                <!-- Eyes Container -->
-                <div class="flex gap-3 mb-1 animate-blink">
-                    <!-- Left Eye -->
-                    <div class="w-3.5 h-4 bg-cyan-300 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)] relative flex items-end justify-end p-0.5">
-                        <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                <!-- Eyes -->
+                <div class="flex gap-2.5 mb-1 animate-blink">
+                    <div class="w-3 h-3.5 bg-cyan-300 rounded-full shadow-[0_0_6px_rgba(34,211,238,0.9)] relative flex items-end justify-end p-0.5">
+                        <div class="w-1 h-1 bg-white rounded-full"></div>
                     </div>
-                    <!-- Right Eye -->
-                    <div class="w-3.5 h-4 bg-cyan-300 rounded-full shadow-[0_0_8px_rgba(34,211,238,0.8)] relative flex items-end justify-end p-0.5">
-                        <div class="w-1.5 h-1.5 bg-white rounded-full"></div>
+                    <div class="w-3 h-3.5 bg-cyan-300 rounded-full shadow-[0_0_6px_rgba(34,211,238,0.9)] relative flex items-end justify-end p-0.5">
+                        <div class="w-1 h-1 bg-white rounded-full"></div>
                     </div>
                 </div>
 
-                <!-- Cheeks (Blush) -->
-                <div class="w-10 flex justify-between px-1 opacity-60 my-0.5">
-                    <div class="w-2 h-1 bg-pink-500 rounded-full blur-[1px]"></div>
-                    <div class="w-2 h-1 bg-pink-500 rounded-full blur-[1px]"></div>
+                <!-- Blush Spots -->
+                <div class="w-8 flex justify-between px-1 opacity-70 my-0.5">
+                    <div class="w-1.5 h-0.5 bg-pink-500 rounded-full"></div>
+                    <div class="w-1.5 h-0.5 bg-pink-500 rounded-full"></div>
                 </div>
 
-                <!-- Mouth (Animated when talking) -->
-                <div id="mouth" class="w-3 h-1.5 bg-slate-400 rounded-full animate-mouth mt-0.5"></div>
+                <!-- Mouth -->
+                <div id="mouth" class="w-2.5 h-1 bg-slate-400 rounded-full animate-mouth mt-0.5"></div>
             </div>
         </div>
     </div>
 
-    <!-- Bottom Controls Footer -->
-    <footer class="w-full bg-slate-900/90 backdrop-blur-md border-t border-slate-800 p-4 flex items-center justify-between gap-3 z-10">
-        <button id="voice-btn" class="flex-1 py-3 px-4 bg-cyan-600 hover:bg-cyan-500 active:bg-cyan-700 text-white rounded-xl font-medium text-xs flex items-center justify-center gap-2 transition-colors shadow-lg shadow-cyan-600/30">
-            <span>🎤</span> Connect ChatGPT Voice
-        </button>
-        <button id="block-btn" class="py-3 px-4 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl text-xs font-medium transition-colors">
-            Simulate App Block
-        </button>
+    <!-- Bottom Controls & Text Input Footer -->
+    <footer class="w-full bg-slate-900/95 backdrop-blur-md border-t border-slate-800 p-3 flex flex-col gap-2 z-10">
+        <!-- Text Box Input Form -->
+        <form id="chat-form" class="flex gap-2">
+            <input type="text" id="user-input" placeholder="Type a message to Aria..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-500">
+            <button type="submit" class="bg-cyan-600 hover:bg-cyan-500 text-white px-4 py-2 rounded-xl text-xs font-medium shadow-lg shadow-cyan-600/30">Send</button>
+        </form>
+        <div class="flex justify-between items-center text-[10px] text-slate-500 px-1">
+            <span>Mic: Active listening</span>
+            <button id="block-btn" class="text-red-400 hover:underline">Simulate App Block</button>
+        </div>
     </footer>
 
-    <!-- App Block Overlay Screen -->
+    <!-- App Block Modal Overlay -->
     <div id="block-screen" class="fixed inset-0 bg-slate-950/95 backdrop-blur-xl z-50 hidden flex flex-col items-center justify-center p-6 text-center">
         <div class="w-16 h-16 bg-red-500/20 border border-red-500/40 rounded-full flex items-center justify-center mb-4 text-2xl">⏳</div>
-        <h2 class="text-xl font-bold mb-2">Time Limit Reached!</h2>
-        <p class="text-xs text-slate-400 max-w-xs mb-6">Aria has locked your app session to protect your schedule.</p>
+        <h2 class="text-xl font-bold mb-2">Time Limit Exceeded!</h2>
+        <p class="text-xs text-slate-400 max-w-xs mb-6">Aria has locked your session to keep you on schedule.</p>
         <button id="dismiss-block" class="w-full max-w-xs py-3 bg-cyan-600 text-white rounded-xl text-xs font-medium shadow-lg">Return to Home</button>
     </div>
 
-    <!-- Script Logic -->
+    <!-- Mobile Autonomous Logic -->
     <script>
         const companion = document.getElementById('companion');
         const avatarContainer = document.getElementById('avatar-container');
         const speechBubble = document.getElementById('speech-bubble');
-        const voiceBtn = document.getElementById('voice-btn');
+        const chatForm = document.getElementById('chat-form');
+        const userInput = document.getElementById('user-input');
         const blockBtn = document.getElementById('block-btn');
         const blockScreen = document.getElementById('block-screen');
         const dismissBlock = document.getElementById('dismiss-block');
         const timerDisplay = document.getElementById('timer-display');
 
-        let isVoiceActive = false;
         let secondsElapsed = 0;
 
         // Screen Time Counter Simulation
@@ -124,31 +122,100 @@
 
             if (secondsElapsed === 120) {
                 blockScreen.classList.remove('hidden');
+                speakAloud("Time limit reached. I am locking your session.");
             }
         }, 1000);
 
-        blockBtn.addEventListener('click', () => blockScreen.classList.remove('hidden'));
+        blockBtn.addEventListener('click', () => {
+            blockScreen.classList.remove('hidden');
+            speakAloud("App block triggered.");
+        });
+
         dismissBlock.addEventListener('click', () => {
             blockScreen.classList.add('hidden');
             secondsElapsed = 0;
+            speakAloud("Welcome back! Session reset.");
         });
 
-        // Tap companion for random reactive expressions & speech
-        const dialogues = [
-            "I'm keeping watch over your screen time!",
-            "Need help? Just tap the voice button.",
-            "You're doing great today!",
-            "Careful, don't get too addicted to scrolling!"
-        ];
-        
-        companion.addEventListener('click', () => {
-            const randomMsg = dialogues[Math.floor(Math.random() * dialogues.length)];
-            speechBubble.textContent = randomMsg;
-            speechBubble.classList.remove('hidden');
-            setTimeout(() => speechBubble.classList.add('hidden'), 4000);
+        // Speaker Output & Lip-Sync Engine
+        function speakAloud(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 1.0;
+                utterance.pitch = 1.2;
+                utterance.volume = 1.0;
+                
+                utterance.onstart = () => {
+                    avatarContainer.classList.add('is-talking', 'border-red-400');
+                    speechBubble.textContent = text;
+                    speechBubble.classList.remove('hidden');
+                };
+                utterance.onend = () => {
+                    avatarContainer.classList.remove('is-talking', 'border-red-400');
+                    setTimeout(() => speechBubble.classList.add('hidden'), 2000);
+                };
+
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // Greet on startup automatically
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                speakAloud("Hi! I am Aria, always active and listening.");
+            }, 800);
+            startContinuousListening();
         });
 
-        // Touch & Drag Support for Mobile Screens
+        // Always-On Voice Detection (Speech Recognition API)
+        function startContinuousListening() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SpeechRecognition) {
+                const recognition = new SpeechRecognition();
+                recognition.continuous = true;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+
+                recognition.onresult = (event) => {
+                    const speechToText = event.results[event.results.length - 1][0].transcript.trim();
+                    speechBubble.textContent = `You: "${speechToText}"`;
+                    speechBubble.classList.remove('hidden');
+
+                    // Generate contextual reply spoken aloud
+                    let reply = `I heard you say, ${speechToText}. How can I help?`;
+                    if(speechToText.toLowerCase().includes('hello') || speechToText.toLowerCase().includes('hi')) {
+                        reply = "Hello there! I'm right here with you.";
+                    } else if(speechToText.toLowerCase().includes('time')) {
+                        reply = `You have spent ${timerDisplay.textContent} on your screen.`;
+                    }
+                    speakAloud(reply);
+                };
+
+                recognition.onerror = () => {
+                    // Auto-restart recognition loop if it drops
+                    setTimeout(() => { try { recognition.start(); } catch(e){} }, 1000);
+                };
+
+                recognition.onend = () => {
+                    try { recognition.start(); } catch(e){}
+                };
+
+                try { recognition.start(); } catch(e){}
+            }
+        }
+
+        // Handle Text Box Form Submission
+        chatForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const text = userInput.value.trim();
+            if(!text) return;
+            
+            userInput.value = '';
+            speakAloud(`You typed: ${text}. Processing your request.`);
+        });
+
+        // Mobile Touch & Drag Logic for Companion
         let startX, startY, initialX, initialY, isDragging = false;
 
         companion.addEventListener('touchstart', (e) => {
@@ -165,30 +232,11 @@
             if (!isDragging) return;
             const dx = e.touches[0].clientX - startX;
             const dy = e.touches[0].clientY - startY;
-            companion.style.left = `${initialX + dx}px`;
-            companion.style.top = `${initialY + dy}px`;
+            companion.style.left = `${Math.max(10, Math.min(window.innerWidth - 80, initialX + dx))}px`;
+            companion.style.top = `${Math.max(50, Math.min(window.innerHeight - 200, initialY + dy))}px`;
         }, { passive: true });
 
         window.addEventListener('touchend', () => { isDragging = false; });
-
-        // ChatGPT Voice Toggle Handler with Lip-Sync Simulation
-        voiceBtn.addEventListener('click', () => {
-            isVoiceActive = !isVoiceActive;
-            if (isVoiceActive) {
-                voiceBtn.innerHTML = '<span>🔴</span> Disconnect Voice';
-                voiceBtn.classList.replace('bg-cyan-600', 'bg-red-600');
-                speechBubble.classList.remove('hidden');
-                speechBubble.textContent = "Listening to you via ChatGPT...";
-                
-                // Triggers active talking/listening expression state
-                avatarContainer.classList.add('is-talking', 'border-red-400');
-            } else {
-                voiceBtn.innerHTML = '<span>🎤</span> Connect ChatGPT Voice';
-                voiceBtn.classList.replace('bg-red-600', 'bg-cyan-600');
-                speechBubble.classList.add('hidden');
-                avatarContainer.classList.remove('is-talking', 'border-red-400');
-            }
-        });
     </script>
 </body>
 </html>
