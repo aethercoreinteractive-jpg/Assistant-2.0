@@ -110,8 +110,7 @@
 
     <!-- Script with OpenAI ChatGPT Integration -->
     <script>
-        // REPLACE THIS WITH YOUR ACTUAL OPENAI API KEY TO ENABLE LIVE CHATGPT REPLIES
-        const OPENAI_API_KEY = "YOUR_OPENAI_API_KEY_HERE";
+        const OPENAI_API_KEY = "Sk-proj-kX9paMy7moKbCJ-fP8YhHLY6n9bM0ta--Oyj1zyelwkTl6XSNgB3J0ZgBYB5UtR_HIzGJQ8gNFT3BlbkFJU6fBh5rn-JKv1gFO0KDAh4z3Jvm8-zaVg9psB7wHeq5Tn1P89dh7b1lKXQEwrTz_EcrHTUTEIA";
 
         const companion = document.getElementById('companion');
         const avatarContainer = document.getElementById('avatar-container');
@@ -174,11 +173,6 @@
 
         // Real ChatGPT API Connection Function
         async function callChatGPT(promptText) {
-            if (OPENAI_API_KEY === "YOUR_OPENAI_API_KEY_HERE") {
-                speakAloud("Please insert your OpenAI API key in the code, Boss.");
-                return;
-            }
-
             try {
                 const response = await fetch("https://api.openai.com/v1/chat/completions", {
                     method: "POST",
@@ -276,3 +270,4 @@
     </script>
 </body>
 </html>
+    
