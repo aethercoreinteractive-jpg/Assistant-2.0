@@ -107,7 +107,7 @@
         <button id="dismiss-block" class="w-full max-w-xs py-3 bg-cyan-600 text-white rounded-xl text-xs font-medium shadow-lg">Let's get back</button>
     </div>
 
-    <!-- Script with Verified Production Model ID -->
+    <!-- Script with Anti-Feedback Loop Integration -->
     <script>
         const GROQ_API_KEY = "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";
 
@@ -122,6 +122,8 @@
         const timerDisplay = document.getElementById('timer-display');
 
         let secondsElapsed = 0;
+        let recognition = null;
+        let isAiSpeaking = false;
 
         // Screen Time Counter
         setInterval(() => {
@@ -157,7 +159,7 @@
             chatLog.scrollTop = chatLog.scrollHeight;
         }
 
-        // Text-to-Speech Speaker Engine & Mouth Animation
+        // Text-to-Speech Speaker Engine & Guard Against Self-Listening
         function speakAloud(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -167,10 +169,22 @@
                 utterance.volume = 1.0;
                 
                 utterance.onstart = () => {
+                    isAiSpeaking = true;
+                    if (recognition) {
+                        try { recognition.stop(); } catch(e) {}
+                    }
                     avatarContainer.classList.add('is-talking', 'border-red-400');
                 };
+
                 utterance.onend = () => {
                     avatarContainer.classList.remove('is-talking', 'border-red-400');
+                    // Delay restarting mic slightly to clear speaker echo
+                    setTimeout(() => {
+                        isAiSpeaking = false;
+                        if (recognition) {
+                            try { recognition.start(); } catch(e) {}
+                        }
+                    }, 600);
                 };
 
                 window.speechSynthesis.speak(utterance);
@@ -189,7 +203,7 @@
                         "Authorization": `Bearer ${GROQ_API_KEY}`
                     },
                     body: JSON.stringify({
-                        model: "openai/gpt-oss-20b",
+                        model: "llama-3.3-70b-versatile",
                         messages: [
                             {
                                 role: "system",
@@ -229,26 +243,35 @@
             startContinuousListening();
         });
 
-        // Always-On Voice Detection
+        // Always-On Voice Detection with Feedback Protection
         function startContinuousListening() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
-                const recognition = new SpeechRecognition();
+                recognition = new SpeechRecognition();
                 recognition.continuous = true;
                 recognition.interimResults = false;
                 recognition.lang = 'en-US';
 
                 recognition.onresult = (event) => {
+                    if (isAiSpeaking) return; // Completely ignore mic input while AI is speaking
                     const speechToText = event.results[event.results.length - 1][0].transcript.trim();
-                    callGroq(speechToText);
+                    if (speechToText) {
+                        callGroq(speechToText);
+                    }
                 };
 
                 recognition.onerror = () => {
-                    setTimeout(() => { try { recognition.start(); } catch(e){} }, 1000);
+                    if (!isAiSpeaking) {
+                        setTimeout(() => { try { recognition.start(); } catch(e){} }, 1000);
+                    }
                 };
+                
                 recognition.onend = () => {
-                    try { recognition.start(); } catch(e){}
+                    if (!isAiSpeaking) {
+                        try { recognition.start(); } catch(e){}
+                    }
                 };
+
                 try { recognition.start(); } catch(e){}
             }
         }
