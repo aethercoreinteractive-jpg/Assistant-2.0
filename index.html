@@ -107,7 +107,7 @@
         <button id="dismiss-block" class="w-full max-w-xs py-3 bg-cyan-600 text-white rounded-xl text-xs font-medium shadow-lg">Let's get back</button>
     </div>
 
-    <!-- Script with Anti-Feedback Loop Integration -->
+    <!-- Script with Verified Production Model ID -->
     <script>
         const GROQ_API_KEY = "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";
 
@@ -159,7 +159,7 @@
             chatLog.scrollTop = chatLog.scrollHeight;
         }
 
-        // Text-to-Speech Speaker Engine & Guard Against Self-Listening
+        // Text-to-Speech Speaker Engine & Mouth Animation
         function speakAloud(text) {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
@@ -175,16 +175,14 @@
                     }
                     avatarContainer.classList.add('is-talking', 'border-red-400');
                 };
-
                 utterance.onend = () => {
                     avatarContainer.classList.remove('is-talking', 'border-red-400');
-                    // Delay restarting mic slightly to clear speaker echo
                     setTimeout(() => {
                         isAiSpeaking = false;
                         if (recognition) {
                             try { recognition.start(); } catch(e) {}
                         }
-                    }, 600);
+                    }, 500);
                 };
 
                 window.speechSynthesis.speak(utterance);
@@ -203,7 +201,7 @@
                         "Authorization": `Bearer ${GROQ_API_KEY}`
                     },
                     body: JSON.stringify({
-                        model: "llama-3.3-70b-versatile",
+                        model: "openai/gpt-oss-20b",
                         messages: [
                             {
                                 role: "system",
@@ -243,7 +241,7 @@
             startContinuousListening();
         });
 
-        // Always-On Voice Detection with Feedback Protection
+        // Always-On Voice Detection
         function startContinuousListening() {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             if (SpeechRecognition) {
@@ -253,7 +251,7 @@
                 recognition.lang = 'en-US';
 
                 recognition.onresult = (event) => {
-                    if (isAiSpeaking) return; // Completely ignore mic input while AI is speaking
+                    if (isAiSpeaking) return;
                     const speechToText = event.results[event.results.length - 1][0].transcript.trim();
                     if (speechToText) {
                         callGroq(speechToText);
@@ -265,13 +263,11 @@
                         setTimeout(() => { try { recognition.start(); } catch(e){} }, 1000);
                     }
                 };
-                
                 recognition.onend = () => {
                     if (!isAiSpeaking) {
                         try { recognition.start(); } catch(e){}
                     }
                 };
-
                 try { recognition.start(); } catch(e){}
             }
         }
